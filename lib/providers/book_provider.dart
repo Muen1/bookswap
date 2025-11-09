@@ -24,3 +24,10 @@ final mySwapOffersProvider = StreamProvider.family<List<SwapOffer>, String>((ref
   final service = ref.read(firestoreServiceProvider);
   return service.getMySwapOffers(userId);
 });
+
+final pendingOffersCountProvider = StreamProvider.family<int, String>((ref, userId) {
+  final service = ref.read(firestoreServiceProvider);
+  return service.getSwapOffersForUser(userId).map((offers) {
+    return offers.where((offer) => offer.status == 'pending').length;
+  });
+});
