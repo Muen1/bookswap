@@ -34,6 +34,8 @@ dependencies:
   
   # UI
   google_fonts: ^6.1.0
+  firebase_messaging: ^14.7.10
+  flutter_local_notifications: ^19.5.0
 
 dev_dependencies:
   flutter_test:

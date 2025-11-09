@@ -1,4 +1,4 @@
-import 'package:bookswap/models/chart.dart';
+import 'package:bookswap/models/chat.dart';
 import 'package:bookswap/screens/chat_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -192,7 +192,7 @@ class _ReceivedOfferCard extends ConsumerWidget {
               lastMessage: 'Chat started',
               lastMessageTime: DateTime.now(),
               swapOfferId: offer.id,
-              bookId: offer.bookId,
+              bookId: offer.bookId, typingUsers: {},
             ),
             currentUserId: currentUser.uid,
             currentUserEmail: currentUser.email!,
@@ -405,7 +405,7 @@ class _SentOfferCard extends ConsumerWidget {
               lastMessage: 'Chat started',
               lastMessageTime: DateTime.now(),
               swapOfferId: offer.id,
-              bookId: offer.bookId,
+              bookId: offer.bookId, typingUsers: {},
             ),
             currentUserId: currentUser.uid,
             currentUserEmail: currentUser.email!,

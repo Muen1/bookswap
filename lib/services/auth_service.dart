@@ -3,6 +3,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 import 'package:bookswap/services/notification_service.dart';
 import 'package:bookswap/models/user_profile.dart';
+import 'package:bookswap/services/sample_data_service.dart'; // Make sure to import this
 
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -28,6 +29,9 @@ class AuthService {
         'createdAt': DateTime.now().millisecondsSinceEpoch,
         'emailVerified': false,
       });
+      
+      // Initialize sample data for the user
+      await initializeUserData(result.user!.uid, email);
       
       // Send email verification
       await result.user!.sendEmailVerification();
@@ -92,6 +96,12 @@ class AuthService {
 
   Future<void> resendVerificationEmail() async {
     await _auth.currentUser!.sendEmailVerification();
+  }
+
+  // Add this to your AuthService class
+  Future<void> initializeUserData(String userId, String email) async {
+    final sampleService = SampleDataService();
+    await sampleService.ensureSampleData(userId, email);
   }
 
   // Existing methods for FCM token and user profile
