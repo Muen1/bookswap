@@ -57,7 +57,7 @@ class ChatService {
     }
   }
 
-  // Send a message
+  // Send a message with status tracking
   Future<void> sendMessage({
     required String chatRoomId,
     required String senderId,
@@ -71,10 +71,11 @@ class ChatService {
         senderEmail: senderEmail,
         message: message,
         timestamp: DateTime.now(),
+        status: MessageStatus.sent, // Initial status
       );
 
       // Add message to subcollection
-      await _firestore
+      final messageRef = await _firestore
           .collection('chatRooms')
           .doc(chatRoomId)
           .collection('messages')
@@ -87,6 +88,21 @@ class ChatService {
           .update({
         'lastMessage': message,
         'lastMessageTime': DateTime.now().millisecondsSinceEpoch,
+      });
+
+      // Simulate delivery after a short delay (in real app, this would be triggered by recipient's device)
+      Future.delayed(const Duration(seconds: 2), () async {
+        try {
+          await updateMessageStatus(
+            messageId: messageRef.id,
+            chatRoomId: chatRoomId,
+            status: MessageStatus.delivered,
+          );
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error simulating delivery: $e');
+          }
+        }
       });
     } catch (e) {
       if (kDebugMode) {
@@ -109,6 +125,7 @@ class ChatService {
         message: message,
         timestamp: DateTime.now(),
         type: MessageType.system,
+        status: MessageStatus.delivered, // System messages are always delivered
       );
 
       await _firestore
@@ -168,5 +185,81 @@ class ChatService {
       roomId: chatRoomId,
       message: '❌ Swap offer for "$bookTitle" has been declined.',
     );
+  }
+
+  // Update message status
+  Future<void> updateMessageStatus({
+    required String messageId,
+    required String chatRoomId,
+    required MessageStatus status,
+    String? readerId, // For read status
+  }) async {
+    try {
+      final updateData = {
+        'status': status.toString().split('.').last,
+      };
+
+      // If marking as read, add to readBy array
+      if (status == MessageStatus.read && readerId != null) {
+        updateData['readBy'] = FieldValue.arrayUnion([readerId]) as String;
+      }
+
+      await _firestore
+          .collection('chatRooms')
+          .doc(chatRoomId)
+          .collection('messages')
+          .doc(messageId)
+          .update(updateData);
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error updating message status: $e');
+      }
+      rethrow;
+    }
+  }
+
+  // Mark all messages in a chat as read by a user
+  Future<void> markAllMessagesAsRead({
+    required String chatRoomId,
+    required String readerId,
+  }) async {
+    try {
+      // Get all unread messages for this user in the chat room
+      final messagesSnapshot = await _firestore
+          .collection('chatRooms')
+          .doc(chatRoomId)
+          .collection('messages')
+          .where('status', whereIn: ['sent', 'delivered'])
+          .where('senderId', isNotEqualTo: readerId) // Only mark others' messages as read
+          .get();
+
+      // Batch update all messages
+      final batch = _firestore.batch();
+      
+      for (final doc in messagesSnapshot.docs) {
+        final messageRef = _firestore
+            .collection('chatRooms')
+            .doc(chatRoomId)
+            .collection('messages')
+            .doc(doc.id);
+        
+        batch.update(messageRef, {
+          'status': MessageStatus.read.toString().split('.').last,
+          'readBy': FieldValue.arrayUnion([readerId]),
+        });
+      }
+
+      if (messagesSnapshot.docs.isNotEmpty) {
+        await batch.commit();
+        if (kDebugMode) {
+          print('Marked ${messagesSnapshot.docs.length} messages as read');
+        }
+      }
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error marking messages as read: $e');
+      }
+      rethrow;
+    }
   }
 }
