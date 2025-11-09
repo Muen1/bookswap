@@ -34,6 +34,7 @@ class ChatService {
           lastMessageTime: DateTime.now(),
           swapOfferId: swapOfferId,
           bookId: bookId,
+          typingUsers: {}, // Initialize typing users map
         );
 
         await _firestore
@@ -260,6 +261,83 @@ class ChatService {
         print('Error marking messages as read: $e');
       }
       rethrow;
+    }
+  }
+
+  // Set typing status for a user in a chat room
+  Future<void> setTypingStatus({
+    required String chatRoomId,
+    required String userId,
+    required bool isTyping,
+  }) async {
+    try {
+      await _firestore
+          .collection('chatRooms')
+          .doc(chatRoomId)
+          .update({
+        'typingUsers.$userId': isTyping,
+        'lastActivity': DateTime.now().millisecondsSinceEpoch,
+      });
+    } catch (e) {
+      if (kDebugMode) {
+        print('Error setting typing status: $e');
+      }
+      rethrow;
+    }
+  }
+
+  // Get typing status stream for a chat room
+  Stream<Map<String, bool>> getTypingStatus(String chatRoomId) {
+    return _firestore
+        .collection('chatRooms')
+        .doc(chatRoomId)
+        .snapshots()
+        .map((snapshot) {
+      final data = snapshot.data();
+      final typingUsers = data?['typingUsers'] as Map<String, dynamic>? ?? {};
+      return typingUsers.map((key, value) => MapEntry(key, value as bool));
+    });
+  }
+
+  // Helper method to automatically stop typing after a delay
+  Future<void> setTypingWithAutoStop({
+    required String chatRoomId,
+    required String userId,
+    required bool isTyping,
+    Duration autoStopDelay = const Duration(seconds: 3),
+  }) async {
+    await setTypingStatus(
+      chatRoomId: chatRoomId,
+      userId: userId,
+      isTyping: isTyping,
+    );
+
+    // If user started typing, automatically stop after delay
+    if (isTyping) {
+      Future.delayed(autoStopDelay, () async {
+        try {
+          // Check if user is still typing before stopping
+          final roomDoc = await _firestore
+              .collection('chatRooms')
+              .doc(chatRoomId)
+              .get();
+          
+          final currentTypingStatus = roomDoc.data()?['typingUsers']?[userId] as bool?;
+          
+          // Only stop if the user is still marked as typing
+          if (currentTypingStatus == true) {
+            await setTypingStatus(
+              chatRoomId: chatRoomId,
+              userId: userId,
+              isTyping: false,
+            );
+          }
+        } catch (e) {
+          if (kDebugMode) {
+            print('Error in auto-stop typing: $e');
+          }
+        }
+      });
     }
   }
 }
