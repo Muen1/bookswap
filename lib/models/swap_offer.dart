@@ -18,7 +18,7 @@ class SwapOffer {
     required this.toUserId,
     required this.toUserEmail,
     required this.status,
-    required this.createdAt,
+    required this.createdAt, required String message,
   });
 
   get message => null;
@@ -46,7 +46,7 @@ class SwapOffer {
       toUserId: map['toUserId'],
       toUserEmail: map['toUserEmail'],
       status: map['status'],
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
+      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']), message: '',
     );
   }
 }

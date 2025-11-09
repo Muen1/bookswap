@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/book.dart';
 import '../models/swap_offer.dart';
-import '../services/firestore_service.dart';
 import '../providers/auth_provider.dart';
 
 class MakeOfferScreen extends ConsumerStatefulWidget {
