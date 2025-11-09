@@ -57,6 +57,8 @@ class ChatMessage {
   final String message;
   final DateTime timestamp;
   final MessageType type;
+  final MessageStatus status; // Add this field
+  final List<String> readBy; // Add this field - list of user IDs who read the message
 
   ChatMessage({
     this.id,
@@ -66,6 +68,8 @@ class ChatMessage {
     required this.message,
     required this.timestamp,
     this.type = MessageType.text,
+    this.status = MessageStatus.sent, // Default status
+    this.readBy = const [], // Initialize as empty list
   });
 
   Map<String, dynamic> toMap() {
@@ -76,6 +80,8 @@ class ChatMessage {
       'message': message,
       'timestamp': timestamp.millisecondsSinceEpoch,
       'type': type.toString().split('.').last,
+      'status': status.toString().split('.').last, // Add status
+      'readBy': readBy, // Add readBy
     };
   }
 
@@ -91,13 +97,54 @@ class ChatMessage {
         (e) => e.toString().split('.').last == map['type'],
         orElse: () => MessageType.text,
       ),
+      status: MessageStatus.values.firstWhere(
+        (e) => e.toString().split('.').last == map['status'],
+        orElse: () => MessageStatus.sent,
+      ),
+      readBy: map['readBy'] != null ? List<String>.from(map['readBy']) : [],
     );
   }
 
   bool isSentBy(String userId) => senderId == userId;
+  
+  // Helper methods for status
+  bool isDelivered() => status == MessageStatus.delivered;
+  bool isRead() => status == MessageStatus.read;
+  
+  // Copy with method for updating status
+  ChatMessage copyWith({
+    String? id,
+    String? chatRoomId,
+    String? senderId,
+    String? senderEmail,
+    String? message,
+    DateTime? timestamp,
+    MessageType? type,
+    MessageStatus? status,
+    List<String>? readBy,
+  }) {
+    return ChatMessage(
+      id: id ?? this.id,
+      chatRoomId: chatRoomId ?? this.chatRoomId,
+      senderId: senderId ?? this.senderId,
+      senderEmail: senderEmail ?? this.senderEmail,
+      message: message ?? this.message,
+      timestamp: timestamp ?? this.timestamp,
+      type: type ?? this.type,
+      status: status ?? this.status,
+      readBy: readBy ?? this.readBy,
+    );
+  }
 }
 
 enum MessageType {
   text,
-  system, 
+  system,
+}
+
+// Add this new enum for message status
+enum MessageStatus {
+  sent,      // Message sent but not delivered to recipient's device
+  delivered, // Message delivered to recipient's device
+  read,      // Message read by recipient
 }
