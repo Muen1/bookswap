@@ -176,6 +176,7 @@ class BookDetailScreen extends ConsumerWidget {
 
   Widget _buildDetailChip(String label, String value, Color color) {
     return Chip(
+      // ignore: deprecated_member_use
       backgroundColor: color.withOpacity(0.2),
       label: Text(
         '$label: $value',
@@ -231,5 +232,49 @@ class BookDetailScreen extends ConsumerWidget {
   }
 }
 
-class MakeOfferScreen {
+class MakeOfferScreen extends StatelessWidget {
+  final Book book;
+
+  const MakeOfferScreen({super.key, required this.book});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Make Offer'),
+      ),
+      body: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'Make an offer for:',
+              style: Theme.of(context).textTheme.titleLarge,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              book.title,
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            const Text(
+              'Contact the owner to arrange the swap.',
+              style: TextStyle(fontSize: 14),
+            ),
+            const Spacer(),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // close after action
+              },
+              style: ElevatedButton.styleFrom(
+                minimumSize: const Size(double.infinity, 50),
+              ),
+              child: const Text('Send Offer'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
