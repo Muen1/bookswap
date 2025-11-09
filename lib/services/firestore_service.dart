@@ -67,11 +67,11 @@ class FirestoreService {
     await _firestore.collection('swapOffers').add(offer.toMap());
   }
 
+  // Get swap offers where user is the recipient
   Stream<List<SwapOffer>> getSwapOffersForUser(String userId) {
     return _firestore
         .collection('swapOffers')
         .where('toUserId', isEqualTo: userId)
-        .where('status', isEqualTo: 'pending')
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) => snapshot.docs
@@ -79,6 +79,7 @@ class FirestoreService {
             .toList());
   }
 
+  // Get swap offers where user is the sender
   Stream<List<SwapOffer>> getMySwapOffers(String userId) {
     return _firestore
         .collection('swapOffers')
@@ -90,9 +91,49 @@ class FirestoreService {
             .toList());
   }
 
+  // Update swap status and handle book availability
   Future<void> updateSwapStatus(String offerId, String status) async {
+    final offerDoc = await _firestore.collection('swapOffers').doc(offerId).get();
+    final offerData = offerDoc.data();
+    
+    if (offerData == null) return;
+
+    // Update the offer status
     await _firestore.collection('swapOffers').doc(offerId).update({
       'status': status,
     });
+
+    // If offer is accepted, mark the book as unavailable
+    if (status == 'accepted') {
+      final bookId = offerData['bookId'];
+      await _firestore.collection('books').doc(bookId).update({
+        'isAvailable': false,
+      });
+
+      // Also reject all other pending offers for the same book
+      final pendingOffers = await _firestore
+          .collection('swapOffers')
+          .where('bookId', isEqualTo: bookId)
+          .where('status', isEqualTo: 'pending')
+          .get();
+
+      for (final doc in pendingOffers.docs) {
+        if (doc.id != offerId) {
+          await doc.reference.update({'status': 'rejected'});
+        }
+      }
+    }
+  }
+
+  // Check if user has already made an offer for a book
+  Future<bool> hasUserMadeOffer(String bookId, String userId) async {
+    final existingOffers = await _firestore
+        .collection('swapOffers')
+        .where('bookId', isEqualTo: bookId)
+        .where('fromUserId', isEqualTo: userId)
+        .where('status', isEqualTo: 'pending')
+        .get();
+
+    return existingOffers.docs.isNotEmpty;
   }
 }
