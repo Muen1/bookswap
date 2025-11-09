@@ -1,4 +1,4 @@
-import 'package:bookswap/models/chart.dart';
+import 'package:bookswap/models/chat.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/foundation.dart';
 
