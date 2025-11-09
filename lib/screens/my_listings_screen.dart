@@ -103,7 +103,7 @@ class _BookListItem extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final firestoreService = ref.read(firestoreServiceProvider);
+    ref.read(firestoreServiceProvider);
 
     return Card(
       margin: const EdgeInsets.only(bottom: 16),
