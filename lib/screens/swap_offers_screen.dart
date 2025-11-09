@@ -1,8 +1,11 @@
+import 'package:bookswap/models/chart.dart';
+import 'package:bookswap/screens/chat_list_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../models/swap_offer.dart';
 import '../providers/auth_provider.dart';
 import '../providers/book_provider.dart';
+import '../providers/chat_provider.dart';
 
 class SwapOffersScreen extends ConsumerWidget {
   const SwapOffersScreen({super.key});
@@ -161,6 +164,52 @@ class _ReceivedOfferCard extends ConsumerWidget {
 
   const _ReceivedOfferCard({required this.offer});
 
+  Future<void> _startChat(BuildContext context, WidgetRef ref) async {
+    final chatService = ref.read(chatServiceProvider);
+    final currentUser = ref.read(authStateProvider).value;
+
+    if (currentUser == null) return;
+
+    try {
+      final chatRoomId = await chatService.getOrCreateChatRoom(
+        user1Id: currentUser.uid,
+        user1Email: currentUser.email!,
+        user2Id: offer.fromUserId,
+        user2Email: offer.fromUserEmail,
+        swapOfferId: offer.id,
+        bookId: offer.bookId,
+      );
+
+      if (!context.mounted) return;
+
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => ChatScreen(
+            chatRoom: ChatRoom(
+              id: chatRoomId,
+              participantIds: [currentUser.uid, offer.fromUserId],
+              participantEmails: [currentUser.email!, offer.fromUserEmail],
+              lastMessage: 'Chat started',
+              lastMessageTime: DateTime.now(),
+              swapOfferId: offer.id,
+              bookId: offer.bookId,
+            ),
+            currentUserId: currentUser.uid,
+            currentUserEmail: currentUser.email!,
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to start chat: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     ref.read(firestoreServiceProvider);
@@ -219,6 +268,12 @@ class _ReceivedOfferCard extends ConsumerWidget {
                 const Spacer(),
 
                 if (offer.status == 'pending') ...[
+                  IconButton(
+                    icon: const Icon(Icons.chat),
+                    onPressed: () => _startChat(context, ref),
+                    tooltip: 'Start Chat',
+                  ),
+                  const SizedBox(width: 8),
                   ElevatedButton(
                     onPressed: () => _handleOfferResponse(
                       context,
@@ -243,6 +298,12 @@ class _ReceivedOfferCard extends ConsumerWidget {
                       backgroundColor: Colors.red,
                     ),
                     child: const Text('Reject'),
+                  ),
+                ] else if (offer.status == 'accepted') ...[
+                  IconButton(
+                    icon: const Icon(Icons.chat),
+                    onPressed: () => _startChat(context, ref),
+                    tooltip: 'Continue Chat',
                   ),
                 ],
               ],
@@ -316,6 +377,52 @@ class _SentOfferCard extends ConsumerWidget {
 
   const _SentOfferCard({required this.offer});
 
+  Future<void> _startChat(BuildContext context, WidgetRef ref) async {
+    final chatService = ref.read(chatServiceProvider);
+    final currentUser = ref.read(authStateProvider).value;
+
+    if (currentUser == null) return;
+
+    try {
+      final chatRoomId = await chatService.getOrCreateChatRoom(
+        user1Id: currentUser.uid,
+        user1Email: currentUser.email!,
+        user2Id: offer.toUserId,
+        user2Email: offer.toUserEmail,
+        swapOfferId: offer.id,
+        bookId: offer.bookId,
+      );
+
+      if (!context.mounted) return;
+
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => ChatScreen(
+            chatRoom: ChatRoom(
+              id: chatRoomId,
+              participantIds: [currentUser.uid, offer.toUserId],
+              participantEmails: [currentUser.email!, offer.toUserEmail],
+              lastMessage: 'Chat started',
+              lastMessageTime: DateTime.now(),
+              swapOfferId: offer.id,
+              bookId: offer.bookId,
+            ),
+            currentUserId: currentUser.uid,
+            currentUserEmail: currentUser.email!,
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!context.mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to start chat: $e'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Card(
@@ -351,7 +458,7 @@ class _SentOfferCard extends ConsumerWidget {
               const SizedBox(height: 8),
             ],
 
-            // Status
+            // Status and Chat Button
             Row(
               children: [
                 Container(
@@ -371,24 +478,36 @@ class _SentOfferCard extends ConsumerWidget {
                 ),
                 const Spacer(),
 
-                // Status-specific text
-                if (offer.status == 'pending')
+                // Chat Button for pending and accepted offers
+                if (offer.status == 'pending') ...[
+                  IconButton(
+                    icon: const Icon(Icons.chat),
+                    onPressed: () => _startChat(context, ref),
+                    tooltip: 'Start Chat',
+                  ),
+                  const SizedBox(width: 8),
                   const Text(
                     'Waiting for response',
                     style: TextStyle(
                       color: Colors.orange,
                       fontStyle: FontStyle.italic,
                     ),
-                  )
-                else if (offer.status == 'accepted')
+                  ),
+                ] else if (offer.status == 'accepted') ...[
+                  IconButton(
+                    icon: const Icon(Icons.chat),
+                    onPressed: () => _startChat(context, ref),
+                    tooltip: 'Continue Chat',
+                  ),
+                  const SizedBox(width: 8),
                   const Text(
                     'Offer accepted!',
                     style: TextStyle(
                       color: Colors.green,
                       fontWeight: FontWeight.bold,
                     ),
-                  )
-                else if (offer.status == 'rejected')
+                  ),
+                ] else if (offer.status == 'rejected')
                   const Text(
                     'Offer declined',
                     style: TextStyle(
