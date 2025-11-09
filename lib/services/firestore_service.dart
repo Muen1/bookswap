@@ -1,7 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/book.dart';
 import '../models/swap_offer.dart';
-import '../services/storage_service.dart';
+import 'storage_service.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -42,7 +42,7 @@ class FirestoreService {
     final bookData = doc.data();
     
     if (bookData != null && bookData['imageUrl'] != null) {
-      // Delete the image from storage
+      // Delete the image from storage using your existing StorageService
       final storageService = StorageService();
       await storageService.deleteImage(bookData['imageUrl']);
     }
