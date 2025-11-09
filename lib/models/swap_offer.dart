@@ -21,6 +21,8 @@ class SwapOffer {
     required this.createdAt,
   });
 
+  get message => null;
+
   Map<String, dynamic> toMap() {
     return {
       'bookId': bookId,
