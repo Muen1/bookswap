@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/book.dart';
 import '../models/swap_offer.dart';
+import '../services/storage_service.dart';
 
 class FirestoreService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -36,7 +37,29 @@ class FirestoreService {
   }
 
   Future<void> deleteBook(String bookId) async {
+    // First get the book to check if it has an image
+    final doc = await _firestore.collection('books').doc(bookId).get();
+    final bookData = doc.data();
+    
+    if (bookData != null && bookData['imageUrl'] != null) {
+      // Delete the image from storage
+      final storageService = StorageService();
+      await storageService.deleteImage(bookData['imageUrl']);
+    }
+    
+    // Delete the book document
     await _firestore.collection('books').doc(bookId).delete();
+    
+    // Also delete any pending swap offers for this book
+    final swapOffers = await _firestore
+        .collection('swapOffers')
+        .where('bookId', isEqualTo: bookId)
+        .where('status', isEqualTo: 'pending')
+        .get();
+    
+    for (final doc in swapOffers.docs) {
+      await doc.reference.delete();
+    }
   }
 
   // Swap operations
