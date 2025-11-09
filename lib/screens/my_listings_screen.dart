@@ -6,8 +6,12 @@ class MyListingsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('My Listings')),
-      body: const Center(child: Text('My Listings Screen - Coming Soon')),
+      appBar: AppBar(
+        title: const Text('My Listings'),
+      ),
+      body: const Center(
+        child: Text('My Listings Screen - Your books will appear here'),
+      ),
     );
   }
 }

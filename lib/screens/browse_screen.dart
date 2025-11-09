@@ -6,8 +6,12 @@ class BrowseScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Browse Listings')),
-      body: const Center(child: Text('Browse Screen - Coming Soon')),
+      appBar: AppBar(
+        title: const Text('Browse Listings'),
+      ),
+      body: const Center(
+        child: Text('Browse Screen - All book listings will appear here'),
+      ),
     );
   }
 }

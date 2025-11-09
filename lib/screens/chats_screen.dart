@@ -6,8 +6,12 @@ class ChatsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Chats')),
-      body: const Center(child: Text('Chats Screen - Coming Soon')),
+      appBar: AppBar(
+        title: const Text('Chats'),
+      ),
+      body: const Center(
+        child: Text('Chats Screen - Your conversations will appear here'),
+      ),
     );
   }
 }

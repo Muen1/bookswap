@@ -51,7 +51,3 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 }
-
-class BrowseScreen {
-  const BrowseScreen();
-}
