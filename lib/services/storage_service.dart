@@ -1,4 +1,5 @@
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'dart:io';
 
 import 'package:flutter/foundation.dart';
@@ -51,4 +52,4 @@ class StorageService {
   }
 }
 
-final storageServiceProvider = StorageService();
+final storageServiceProvider = Provider<StorageService>((ref) => StorageService());

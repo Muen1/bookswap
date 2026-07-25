@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import '../models/book.dart';
 import '../providers/book_provider.dart';
+import '../services/storage_service.dart';
 
 class AddBookScreen extends ConsumerStatefulWidget {
   final Book? book;
@@ -45,7 +46,6 @@ class _AddBookScreenState extends ConsumerState<AddBookScreen> {
     'Other'
   ];
   
-  ProviderListenable? get storageServiceProvider => null;
 
   @override
   void initState() {
@@ -75,7 +75,7 @@ class _AddBookScreenState extends ConsumerState<AddBookScreen> {
   Future<String?> _uploadImage() async {
     if (_imageFile == null) return null;
 
-    final storageService = ref.read(storageServiceProvider!);
+    final storageService = ref.read(storageServiceProvider);
     return await storageService.uploadBookImage(_imageFile!);
   }
 
