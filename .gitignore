@@ -31,4 +31,5 @@ build/
 /ios/**/.vagrant/
 /ios/**/DerivedData/
 /ios/**/Icon?
-/ios/**/Pods/
+/ios/**/Pods/.idea/
+analyzer_report.txt
