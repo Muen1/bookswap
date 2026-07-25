@@ -72,8 +72,8 @@ A modern Flutter application that enables students to exchange textbooks seamles
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/Muen1/bookswap-flutter.git
-   cd bookswap-flutter
+   git clone https://github.com/Muen1/bookswap.git
+   cd bookswap
 
 2. **Firebase setup**
 Create Firebase Project
