@@ -2,10 +2,10 @@ import 'package:bookswap/providers/auth_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
-import 'dart:io';
 import '../models/book.dart';
 import '../providers/book_provider.dart';
 import '../services/storage_service.dart';
+import 'dart:typed_data';
 
 class AddBookScreen extends ConsumerStatefulWidget {
   final Book? book;
@@ -26,7 +26,7 @@ class _AddBookScreenState extends ConsumerState<AddBookScreen> {
 
   String _condition = 'Like New';
   String _category = 'Textbook';
-  File? _imageFile;
+  Uint8List? _imageBytes;
   bool _isLoading = false;
 
   final List<String> _conditions = [
@@ -61,22 +61,23 @@ class _AddBookScreenState extends ConsumerState<AddBookScreen> {
     }
   }
 
-  Future<void> _pickImage() async {
-    final picker = ImagePicker();
-    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+Future<void> _pickImage() async {
+  final picker = ImagePicker();
+  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-    if (pickedFile != null) {
-      setState(() {
-        _imageFile = File(pickedFile.path);
-      });
-    }
+  if (pickedFile != null) {
+    final bytes = await pickedFile.readAsBytes();
+    setState(() {
+      _imageBytes = bytes;
+    });
   }
+}
 
   Future<String?> _uploadImage() async {
-    if (_imageFile == null) return null;
+    if (_imageBytes == null) return null;
 
     final storageService = ref.read(storageServiceProvider);
-    return await storageService.uploadBookImage(_imageFile!);
+    return await storageService.uploadBookImage(_imageBytes!);
   }
 
   Future<void> _submit() async {
@@ -177,8 +178,8 @@ class _AddBookScreenState extends ConsumerState<AddBookScreen> {
                           border: Border.all(color: Colors.grey),
                           borderRadius: BorderRadius.circular(8),
                         ),
-                        child: _imageFile != null
-                            ? Image.file(_imageFile!, fit: BoxFit.cover)
+                        child: _imageBytes != null
+                            ? Image.memory(_imageBytes!, fit: BoxFit.cover)
                             : widget.book?.imageUrl != null
                                 ? Image.network(
                                     widget.book!.imageUrl!,
