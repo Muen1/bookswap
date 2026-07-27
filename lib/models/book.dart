@@ -46,23 +46,25 @@ class Book {
     };
   }
 
-  static Book fromMap(Map<String, dynamic> map, String id) {
-    return Book(
-      id: id,
-      title: map['title'],
-      author: map['author'],
-      isbn: map['isbn'],
-      condition: map['condition'],
-      category: map['category'],
-      description: map['description'],
-      imageUrl: map['imageUrl'],
-      ownerId: map['ownerId'],
-      ownerEmail: map['ownerEmail'],
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']),
-      swapFor: map['swapFor'],
-      isAvailable: map['isAvailable'] ?? true,
-    );
-  }
+static Book fromMap(Map<String, dynamic> map, String id) {
+  return Book(
+    id: id,
+    title: map['title'] ?? 'Untitled',
+    author: map['author'] ?? 'Unknown',
+    isbn: map['isbn'] ?? '',
+    condition: map['condition'] ?? 'Unknown',
+    category: map['category'] ?? 'Other',
+    description: map['description'],
+    imageUrl: map['imageUrl'],
+    ownerId: map['ownerId'] ?? '',
+    ownerEmail: map['ownerEmail'] ?? '',
+    createdAt: map['createdAt'] != null
+        ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'])
+        : DateTime.now(),
+    swapFor: map['swapFor'],
+    isAvailable: map['isAvailable'] ?? true,
+  );
+}
 
   Book copyWith({
     String? id,
