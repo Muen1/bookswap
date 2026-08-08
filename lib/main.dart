@@ -5,7 +5,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'app.dart';
 import 'services/notification_service.dart';
-
+import 'theme/app_colors.dart';
+import 'providers/theme_provider.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -21,8 +22,7 @@ void main() async {
     if (kDebugMode) {
       print('Error initializing Firebase: $e');
     }
-    // You might want to handle this differently in production
-    // For now, we'll continue running the app even if Firebase fails
+    
   }
   
   // Initialize notifications with error handling
@@ -35,47 +35,55 @@ void main() async {
     if (kDebugMode) {
       print('Error initializing notifications: $e');
     }
-    // Continue running the app even if notifications fail
+    
   }
   
   runApp(const ProviderScope(child: MyApp()));
 }
 
-class MyApp extends StatelessWidget {
+class MyApp extends ConsumerWidget {
   const MyApp({super.key});
-
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final themeMode = ref.watch(themeModeProvider);
     return MaterialApp(
       title: 'BookSwap',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
-          brightness: Brightness.light,
-        ),
-        useMaterial3: true,
-        appBarTheme: const AppBarTheme(
-          centerTitle: true,
-          elevation: 2,
-        ),
-        inputDecorationTheme: InputDecorationTheme(
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 14,
-          ),
-        ),
-      ),
+  colorScheme: ColorScheme.fromSeed(
+    seedColor: AppColors.spineGreen,
+    brightness: Brightness.light,
+    surface: AppColors.paper,
+    secondary: AppColors.mustard,
+  ),
+  scaffoldBackgroundColor: AppColors.paper,
+  useMaterial3: true,
+  appBarTheme: const AppBarTheme(
+    centerTitle: true,
+    elevation: 2,
+    backgroundColor: AppColors.spineGreen,
+    foregroundColor: AppColors.paper,
+  ),
+  cardTheme: const CardThemeData(
+    color: AppColors.cardSurface,
+  ),
+  inputDecorationTheme: InputDecorationTheme(
+    border: OutlineInputBorder(
+      borderRadius: BorderRadius.circular(12),
+    ),
+    contentPadding: const EdgeInsets.symmetric(
+      horizontal: 16,
+      vertical: 14,
+    ),
+  ),
+),
       darkTheme: ThemeData(
         colorScheme: ColorScheme.fromSeed(
-          seedColor: Colors.blue,
+          seedColor: AppColors.spineGreen,
           brightness: Brightness.dark,
         ),
         useMaterial3: true,
       ),
-      themeMode: ThemeMode.system,
+      themeMode: themeMode,
       home: const App(),
       debugShowCheckedModeBanner: false,
       // Add error handling for the entire app
