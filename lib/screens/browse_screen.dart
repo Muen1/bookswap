@@ -4,6 +4,7 @@ import '../models/book.dart';
 import '../providers/book_provider.dart';
 import '../providers/auth_provider.dart';
 import 'add_book_screen.dart';
+import 'book_detail_screen.dart';
 
 class BrowseScreen extends ConsumerStatefulWidget {
   const BrowseScreen({super.key});
@@ -361,65 +362,5 @@ class _BookCard extends StatelessWidget {
       default:
         return Colors.grey;
     }
-  }
-}
-
-class BookDetailScreen extends StatelessWidget {
-  final Book book;
-
-  const BookDetailScreen({super.key, required this.book});
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(book.title),
-      ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (book.imageUrl != null)
-              Center(
-                child: Image.network(
-                  book.imageUrl!,
-                  height: 200,
-                  fit: BoxFit.cover,
-                ),
-              )
-            else
-              const Center(
-                child: Icon(Icons.book, size: 100, color: Colors.grey),
-              ),
-            const SizedBox(height: 16),
-            Text(
-              book.title,
-              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Author: ${book.author}',
-              style: const TextStyle(fontSize: 16),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Category: ${book.category}',
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              'Condition: ${book.condition}',
-              style: const TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            const SizedBox(height: 16),
-            Text(
-              book.description ?? 'No description provided.',
-              style: const TextStyle(fontSize: 14),
-            ),
-          ],
-        ),
-      ),
-    );
   }
 }
