@@ -3,7 +3,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'browse_screen.dart';
 import 'my_listings_screen.dart';
 import 'swap_offers_screen.dart';
-import 'chat_list_screen.dart';
 import 'settings_screen.dart';
 import '../providers/auth_provider.dart';
 import '../providers/book_provider.dart';
@@ -22,7 +21,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     const BrowseScreen(),
     const MyListingsScreen(),
     const SwapOffersScreen(),
-    const ChatListScreen(),
     const SettingsScreen(),
   ];
 
