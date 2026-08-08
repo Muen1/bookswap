@@ -7,6 +7,7 @@ class SwapOffer {
   final String toUserId;
   final String toUserEmail;
   final String status; // 'pending', 'accepted', 'rejected'
+  final String message;
   final DateTime createdAt;
 
   SwapOffer({
@@ -18,10 +19,9 @@ class SwapOffer {
     required this.toUserId,
     required this.toUserEmail,
     required this.status,
-    required this.createdAt, required String message,
+    required this.message,
+    required this.createdAt,
   });
-
-  get message => null;
 
   Map<String, dynamic> toMap() {
     return {
@@ -32,6 +32,7 @@ class SwapOffer {
       'toUserId': toUserId,
       'toUserEmail': toUserEmail,
       'status': status,
+      'message': message,
       'createdAt': createdAt.millisecondsSinceEpoch,
     };
   }
@@ -39,14 +40,17 @@ class SwapOffer {
   static SwapOffer fromMap(Map<String, dynamic> map, String id) {
     return SwapOffer(
       id: id,
-      bookId: map['bookId'],
-      bookTitle: map['bookTitle'],
-      fromUserId: map['fromUserId'],
-      fromUserEmail: map['fromUserEmail'],
-      toUserId: map['toUserId'],
-      toUserEmail: map['toUserEmail'],
-      status: map['status'],
-      createdAt: DateTime.fromMillisecondsSinceEpoch(map['createdAt']), message: '',
+      bookId: map['bookId'] ?? '',
+      bookTitle: map['bookTitle'] ?? 'Untitled',
+      fromUserId: map['fromUserId'] ?? '',
+      fromUserEmail: map['fromUserEmail'] ?? '',
+      toUserId: map['toUserId'] ?? '',
+      toUserEmail: map['toUserEmail'] ?? '',
+      status: map['status'] ?? 'pending',
+      message: map['message'] ?? '',
+      createdAt: map['createdAt'] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map['createdAt'])
+          : DateTime.now(),
     );
   }
 }
