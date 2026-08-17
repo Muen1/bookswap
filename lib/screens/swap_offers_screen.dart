@@ -239,9 +239,9 @@ class _ReceivedOfferCard extends ConsumerWidget {
             const SizedBox(height: 8),
 
             // Message (if any)
-            if (offer.message != null && offer.message!.isNotEmpty) ...[
+            if (offer.message.isNotEmpty) ...[
               Text(
-                'Message: ${offer.message!}',
+                'Message: ${offer.message}',
                 style: const TextStyle(fontSize: 14),
               ),
               const SizedBox(height: 8),
@@ -450,9 +450,9 @@ class _SentOfferCard extends ConsumerWidget {
             const SizedBox(height: 8),
 
             // Message (if any)
-            if (offer.message != null && offer.message!.isNotEmpty) ...[
+            if (offer.message.isNotEmpty) ...[
               Text(
-                'Your message: ${offer.message!}',
+                'Your message: ${offer.message}',
                 style: const TextStyle(fontSize: 14),
               ),
               const SizedBox(height: 8),
