@@ -1,22 +1,13 @@
 # BookSwap - Flutter Firebase Textbook Exchange App
 
-![Flutter](https://img.shields.io/badge/Flutter-3.19-blue)
-![Firebase](https://img.shields.io/badge/Firebase-FFCA28?logo=firebase)
-![Dart](https://img.shields.io/badge/Dart-0175C2?logo=dart)
-
 A modern Flutter application that enables students to exchange textbooks seamlessly using Firebase backend services. BookSwap demonstrates complete mobile development with authentication, real-time data synchronization, and complex state management.
 
-## Demo & Documentation
-
-- **Demo Video**: [Watch the Full Demo](https://youtu.be/GXXs-DYTPsg) 
-- **Project Report**: [Download PDF Documentation](https://docs.google.com/document/d/1TG9l5oxw7dmydUepbXQjp0UeVh-EYwH86tyo5dMojvU/edit?usp=sharing)
 
 ##  Features
 
 ### Authentication & Security
 - **Email/Password Authentication** with Firebase Auth
 - **Email Verification** flow with proper UI routing
-- **Secure Routing** - blocks unverified users from app features
 - **Automatic Session Management** with Riverpod state
 
 ###  Book Management (CRUD Operations)
@@ -31,23 +22,65 @@ A modern Flutter application that enables students to exchange textbooks seamles
 - **Dual Perspectives** - Separate views for sent vs received offers
 - **Real-time Status Updates** - Instant notification of offer changes
 
+### In-App Chat
+- Real-time messaging between users tied to a swap (`chat_room`, `chat_message` models)
+- Dedicated chat list and conversation screens
+
+### Push Notifications (server-side)
+- Firebase Cloud Functions listen for Firestore writes and push notifications via FCM:
+   * New swap offer → notifies the recipient
+   * New chat message → notifies the other participant
+- Local notification handling on-device via `flutter_local_notifications`
+
 ###  Navigation & State
 - **Bottom Navigation** - Four main tabs: Browse, My Listings, Chats, Settings
 - **Riverpod State Management** - Clean, testable architecture
 - **Persistent State** - Maintains data across navigation
 - **Optimized Queries** - Efficient Firestore data fetching
 
+## Architecture
+
+```diagram
+┌─────────────────────────┐
+│      Flutter Client       │
+│  screens/ → providers/ →  │
+│         services/          │
+└─────────────┬─────────────┘
+              │
+     Firebase SDKs (Auth, Firestore,
+        Storage, Messaging)
+              │
+┌─────────────▼─────────────┐
+│   Cloud Firestore / Auth   │
+│      / Storage (Backend)   │
+└─────────────┬─────────────┘
+              │  onCreate triggers
+┌─────────────▼─────────────┐
+│   Cloud Functions (Node)   │
+│  onSwapOfferCreated        │
+│  onNewChatMessage          │
+│       → sends FCM push     │
+└─────────────────────────────┘
+```
+The app follows a layered structure:
+* `lib/models/`- plain Dart data classes ( `Book`, `ChatRoom`, `ChatMessage`, `SwapOffer`, `UserProfile`)
+* `lib/services/` - Firebase integration (`auth_service`, `firestore_service`, `chat_service`, `storage_service`, `notification_service`)
+* `lib/providers/` - Riverpod providers wiring services to UI state
+* `lib/screens/` - UI, one file per screen
+* `functions/` - Cloud Functions backend (Node.js) for push notifications
+
 ##  Technology Stack
 
 | Layer | Technology | Purpose |
-|-------|------------|---------|
-| **Frontend** | Flutter 3.19 | Cross-platform UI framework |
-| **Backend** | Firebase | BaaS (Backend as a Service) |
-| **Authentication** | Firebase Auth | User management & security |
-| **Database** | Cloud Firestore | Real-time NoSQL database |
-| **Storage** | Firebase Storage | Image uploads & management |
-| **State Management** | Riverpod | Predictable state container |
-| **Language** | Dart 3.0 | Type-safe, compiled language |
+| :--- | :--- | :--- |
+| **Frontend** | Flutter 3.19 / Dart 3.0 | Cross-platform UI |
+| **Auth** | Firebase Auth | User accounts & email verification |
+| **Database** | Cloud Firestore | Real-time NoSQL data |
+| **Storage** | Firebase Storage | Book photo uploads |
+| **State Management** | Riverpod | App-wide state |
+| **Push Notifications** | Firebase Cloud Functions + FCM | Server-triggered notifications |
+| **Local Notifications** | flutter_local_notifications | On-device notification display |
+
 
 ##  Screenshots
 
@@ -82,24 +115,30 @@ Create Firebase Project
  Enable Authentication with Email/Password
  Create Firestore Database in test mode
  Create Storage Bucket
-Configure  Firebase for Flutter
+Run `flutterfire configure` to generate `lib/firebase_options.dart` for your project
 
-3. **Environment configuration**
-    ```dart
-    class Config {
-      static const String firebaseProjectId = 'your-project-id';
-      static const bool useEmulator = true; // Set to false for production
-    }
-
-4. **Install Dependencies**
+3. **Install Dependencies**
    ```bash
    flutter pub get
+   ```
 
-5. **Run Dart Analysis**
+4. **(Optional) Deploy Cloud Functions for push notifications**
+```bash
+cd functions
+   npm install
+   firebase deploy --only functions
+```
+
+5. **Run the app**
    ```bash
-   flutter analyze
-   dart format .
-   dart analyze --fatal-infos
+   flutter run
 
-6. **Firebase Emulator Setup**
+6. **Code Quality**
+```bash
+flutter analyze
+dart format .
+```
+
+
+
 
