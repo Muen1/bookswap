@@ -259,28 +259,37 @@ class _BookCard extends StatelessWidget {
           children: [
             // Book Image
             Expanded(
-              child: Container(
-                decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.vertical(
-                    top: Radius.circular(4),
-                  ),
-                  image: book.imageUrl != null
-                      ? DecorationImage(
-                          image: NetworkImage(book.imageUrl!),
-                          fit: BoxFit.cover,
-                        )
-                      : const DecorationImage(
-                          image: AssetImage('assets/images/book_placeholder.png'),
-                          fit: BoxFit.cover,
-                        ),
-                ),
-                child: book.imageUrl == null
-                    ? const Center(
-                        child: Icon(Icons.book, size: 40, color: Colors.grey),
-                      )
-                    : null,
+              child: book.imageUrl != null
+              ? Image.network(
+          book.imageUrl!,
+          fit: BoxFit.cover,
+          width: double.infinity,
+          errorBuilder: (context, error, stackTrace) {
+            return Center(
+              child: Text(
+                'Image error:\n$error',
+                style: const TextStyle(fontSize: 10, color: Colors.red),
+                textAlign: TextAlign.center,
               ),
+            );
+          },
+          loadingBuilder: (context, child, progress) {
+            if (progress == null) return child;
+            return const Center(child: CircularProgressIndicator());
+          },
+        )
+      : Container(
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              image: AssetImage('assets/images/book_placeholder.png'),
+              fit: BoxFit.cover,
             ),
+          ),
+          child: const Center(
+            child: Icon(Icons.book, size: 40, color: Colors.grey),
+          ),
+        ),
+),
 
             // Book Details
             Padding(
