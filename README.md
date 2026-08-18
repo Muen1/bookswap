@@ -40,28 +40,8 @@ A modern Flutter application that enables students to exchange textbooks seamles
 
 ## Architecture
 
-```diagram
-┌─────────────────────────┐
-│      Flutter Client       │
-│  screens/ → providers/ →  │
-│         services/          │
-└─────────────┬─────────────┘
-              │
-     Firebase SDKs (Auth, Firestore,
-        Storage, Messaging)
-              │
-┌─────────────▼─────────────┐
-│   Cloud Firestore / Auth   │
-│      / Storage (Backend)   │
-└─────────────┬─────────────┘
-              │  onCreate triggers
-┌─────────────▼─────────────┐
-│   Cloud Functions (Node)   │
-│  onSwapOfferCreated        │
-│  onNewChatMessage          │
-│       → sends FCM push     │
-└─────────────────────────────┘
-```
+! [Architecture Diagram](assets/images/architecture.jpg)
+
 The app follows a layered structure:
 * `lib/models/`- plain Dart data classes ( `Book`, `ChatRoom`, `ChatMessage`, `SwapOffer`, `UserProfile`)
 * `lib/services/` - Firebase integration (`auth_service`, `firestore_service`, `chat_service`, `storage_service`, `notification_service`)
@@ -86,7 +66,7 @@ The app follows a layered structure:
 
 | Authentication | My Listings | Browse Books | Swap Offers |
 |----------------|-------------|--------------|-------------|
-| ![Auth](https://1drv.ms/i/c/47659f4dae4e3118/EXVoRMNZ5TBDthjvVXgPwowBrKNkO2r5qz1gzHTS6TGtlA?e=n2X1ko) | ![Listings](https://1drv.ms/i/c/47659f4dae4e3118/EdPkzkQ6rd1DpbiEWCgwEBMBoRuNMqQAPToC60FD3Ac-1A?e=Te9YDC) | ![Browse](https://1drv.ms/i/c/47659f4dae4e3118/EWczG9rA6kFFtFYVv0NVYcMB5ckT9biP5HCpVsrqWlPhIw?e=eCswAU) | ![Offers](https://1drv.ms/i/c/47659f4dae4e3118/ERVELFprOstFmEnP7_29ZGkBb03aZgWI1gwwdlSiCP8ImQ?e=DiQQhg) |
+| ![Auth](assets/images/auth.png) | ![Listings](assets/images/my_listings.png) | ![Browse](assets/images/browse.png) | ![Offers](assets/images/swap_offers.png) |
 
 
 ## Architecture
