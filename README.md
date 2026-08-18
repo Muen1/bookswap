@@ -40,7 +40,7 @@ A modern Flutter application that enables students to exchange textbooks seamles
 
 ## Architecture
 
-! [Architecture Diagram](assets/images/architecture.jpg)
+![Architecture Diagram](assets/images/architecture.jpg)
 
 The app follows a layered structure:
 * `lib/models/`- plain Dart data classes ( `Book`, `ChatRoom`, `ChatMessage`, `SwapOffer`, `UserProfile`)
@@ -69,8 +69,6 @@ The app follows a layered structure:
 | ![Auth](assets/images/auth.png) | ![Listings](assets/images/my_listings.png) | ![Browse](assets/images/browse.png) | ![Offers](assets/images/swap_offers.png) |
 
 
-## Architecture
-[!diagram](https://1drv.ms/i/c/47659f4dae4e3118/EZ0JB0uT5-dNg2C0NewvvTYBAUmzu__5KYF-T51WJAgjmA?e=ftfuBu)
 
 
 ##  Getting Started
@@ -119,6 +117,7 @@ flutter analyze
 dart format .
 ```
 
-
+## Video Demo
+ [YouTube Link](https://youtu.be/Nh3tzPuTg1o?si=8NVelhBb7k0IuM3H)
 
 
